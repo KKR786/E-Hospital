@@ -26,7 +26,7 @@ app.use(( req, res, next ) => {
 
 
 app.use('/api', publicRoutes);
-app.use('/api/protected', protectedRoutes);
+// app.use('/api/protected', protectedRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
