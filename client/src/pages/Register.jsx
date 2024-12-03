@@ -45,7 +45,7 @@ function Register() {
   return (
     <section className="bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
-        <div className="w-1/2 rounded-lg shadow border md:mt-0 max-sm:max-w-md xl:p-0 bg-gray-800 border-gray-700">
+        <div className="w-1/2 rounded-lg shadow border my-4 max-sm:max-w-md xl:p-0 bg-gray-800 border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl text-center font-bold leading-tight tracking-tight md:text-2xl text-white">
               Create an account
@@ -61,7 +61,7 @@ function Register() {
                     for="email"
                     className="block mb-2 text-sm font-medium text-white"
                   >
-                    Your email
+                    Your email <span className="text-red-500" title='required'>*</span>
                   </label>
                   <input
                     type="email"
@@ -78,7 +78,7 @@ function Register() {
                     for="name"
                     className="block mb-2 text-sm font-medium text-white"
                   >
-                    Your name
+                    Your name <span className="text-red-500" title='required'>*</span>
                   </label>
                   <input
                     type="text"
@@ -98,7 +98,7 @@ function Register() {
                     htmlFor="bloodGroup"
                     className="block mb-2 text-sm font-medium text-white"
                   >
-                    Blood Group
+                    Blood Group <span className="text-red-500" title='required'>*</span>
                   </label>
                   <select
                     name="bloodGroup"
@@ -124,7 +124,7 @@ function Register() {
                     htmlFor="userType"
                     className="block mb-2 text-sm font-medium text-white"
                   >
-                    User Type
+                    User Type <span className="text-red-500" title='required'>*</span>
                   </label>
                   <select
                     name="userType"
@@ -147,7 +147,7 @@ function Register() {
                     htmlFor="department"
                     className="block mb-2 text-sm font-medium text-white"
                   >
-                    Department
+                    Department <span className="text-red-500" title='required'>*</span>
                   </label>
                   <input
                     type="text"
@@ -156,6 +156,7 @@ function Register() {
                     onChange={handleInputChange}
                     className="border rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                     placeholder="e.g. Cardiology"
+                    required
                   />
                 </div>
 
@@ -164,7 +165,7 @@ function Register() {
                     htmlFor="degree"
                     className="block mb-2 text-sm font-medium text-white"
                   >
-                    Degree
+                    Degree <span className="text-red-500" title='required'>*</span>
                   </label>
                   <input
                     type="text"
@@ -173,6 +174,7 @@ function Register() {
                     onChange={handleInputChange}
                     className="border rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                     placeholder="e.g. MD, MBBS"
+                    required
                   />
                 </div>
               </div>}
@@ -183,7 +185,7 @@ function Register() {
                     htmlFor="phoneNumber"
                     className="block mb-2 text-sm font-medium text-white"
                   >
-                    Phone Number
+                    Phone Number <span className="text-red-500" title='required'>*</span>
                   </label>
                   <input
                     type="text"
@@ -232,7 +234,6 @@ function Register() {
                   onChange={handleInputChange}
                   className="border rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Your address"
-                  required
                 />
               </div>
 
@@ -278,7 +279,7 @@ function Register() {
                     for="password"
                     className="block mb-2 text-sm font-medium text-white"
                   >
-                    Password
+                    Password <span className="text-red-500" title='required'>*</span>
                   </label>
                   <input
                     type="password"
