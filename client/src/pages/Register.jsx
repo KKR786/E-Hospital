@@ -5,6 +5,7 @@ import Error from "../components/toast/Error";
 
 function Register() {
   const { signup, error, isLoading } = useSignup();
+  const [blood, setBlood] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [formData, setFormData] = useState({
     email: "",
@@ -15,8 +16,6 @@ function Register() {
     userType: "",
     department: "",
     degree: "",
-    willDonateBlood: "",
-    role: "",
     password: "",
   });
 
@@ -30,6 +29,7 @@ function Register() {
     });
 
     data.append("dp", photo);
+    data.append("willDonateBlood", blood);
 
     await signup(data);
   };
@@ -134,14 +134,14 @@ function Register() {
                     required
                   >
                     <option value="">Select User Type</option>
-                    <option value="doctor">Doctor</option>
-                    <option value="therapist">Therapist</option>
-                    <option value="user">User</option>
+                    <option value="Doctor">Doctor</option>
+                    <option value="Therapist">Therapist</option>
+                    <option value="User">User</option>
                   </select>
                 </div>
               </div>
 
-              {(formData.userType === 'doctor' || formData.userType === 'therapist') && <div className="lg:flex lg:space-x-4">
+              {(formData.userType === 'Doctor' || formData.userType === 'Therapist') && <div className="lg:flex lg:space-x-4">
                 <div className="flex-1">
                   <label
                     htmlFor="department"
@@ -207,7 +207,7 @@ function Register() {
                       type="checkbox"
                       name="willDonateBlood"
                       id="willDonateBlood"
-                      onChange={handleInputChange}
+                      onChange={(e) => setBlood(e.target.checked)}
                       className="w-5 h-5"
                     />
                     <label

@@ -2,11 +2,12 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import { useAuthContext } from "./hooks/useAuth";
 
+
+import Nav from "./components/navbar/Nav";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
-import Map from "./components/Map";
 import GetBlood from "./pages/GetBlood";
 
 function App() {

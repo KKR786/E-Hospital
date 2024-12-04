@@ -1,36 +1,32 @@
 import { useState, useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import redMarker from "../assets/red-marker.png"
+import redMarker from "../assets/red-marker.png";
+import "leaflet-routing-machine";
+import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 
 function Map() {
   const [coordinates, setCoordinates] = useState([0, 0]);
   const [place, setPlace] = useState("");
   const [currentLocationName, setCurrentLocationName] = useState("");
   const [distances, setDistances] = useState([]);
+  const [directionsUrl, setDirectionsUrl] = useState("");
+
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const markerRef = useRef(null);
-
-  const predefinedCoordinates = [
-    { lat: 23.7530215, lon: 90.4238998, name: "Location 1" },
-    { lat: 23.7600215, lon: 90.4288998, name: "Location 2" },
-    { lat: 23.7620215, lon: 90.4298998, name: "Location 3" },
-    { lat: 23.7650215, lon: 90.4308998, name: "Location 4" },
-    { lat: 23.7700215, lon: 90.4318998, name: "Location 5" },
-  ];
+  const markersArray = useRef([]);
+  const routingControlRef = useRef(null);
 
   useEffect(() => {
     if (!mapInstance.current) {
-      mapInstance.current = L.map(mapRef.current).setView([51.505, -0.09], 13);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapInstance.current);
-
-      predefinedCoordinates.forEach(({ lat, lon, name }) => {
-        L.marker([lat, lon])
-          .addTo(mapInstance.current)
-          .bindPopup(`Predefined location: ${name}`)
-          .openPopup();
-      });
+      mapInstance.current = L.map(mapRef.current).setView(
+        [23.7530215, 90.4248998],
+        13
+      );
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+        mapInstance.current
+      );
 
       mapInstance.current.on("click", async (e) => {
         const { lat, lng } = e.latlng;
@@ -47,10 +43,10 @@ function Map() {
     } else {
       markerRef.current = L.marker(newCoordinates, {
         icon: L.icon({
-            iconUrl: redMarker,
-            iconSize: [25, 41], // size of the icon
-            iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
-            popupAnchor: [1, -34],
+          iconUrl: redMarker,
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
         }),
       })
         .addTo(mapInstance.current)
@@ -58,6 +54,7 @@ function Map() {
         .openPopup();
     }
     await getPlaceName(lat, lon);
+    await fetchNearbyHospitals(lat, lon);
     calculateDistances(lat, lon);
   };
 
@@ -78,17 +75,17 @@ function Map() {
     }
   };
 
-  const calculateDistances = (lat, lon) => {
-    // Calculate distance to each predefined location
-    const distancesArray = predefinedCoordinates.map((location) => {
-      const distance = L.latLng(lat, lon).distanceTo(L.latLng(location.lat, location.lon));
-      return {
-        name: location.name,
-        distance: (distance / 1000).toFixed(2), // convert meters to kilometers
-      };
-    });
-    setDistances(distancesArray);
-  };
+  //   const calculateDistances = (lat, lon) => {
+  //     // Calculate distance to each predefined location
+  //     const distancesArray = predefinedCoordinates.map((location) => {
+  //       const distance = L.latLng(lat, lon).distanceTo(L.latLng(location.lat, location.lon));
+  //       return {
+  //         name: location.name,
+  //         distance: (distance / 1000).toFixed(2), // convert meters to kilometers
+  //       };
+  //     });
+  //     setDistances(distancesArray);
+  //   };
 
   const searchPlace = async () => {
     const response = await fetch(
@@ -117,34 +114,59 @@ function Map() {
       );
       out body;
     `;
-    const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+    const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
+      query
+    )}`;
 
     try {
       const response = await fetch(url);
       const data = await response.json();
       const hospitals = data.elements;
 
+      markersArray.current.forEach((marker) => mapInstance.current.removeLayer(marker));
+      markersArray.current = [];
+
       hospitals.forEach((hospital) => {
         const lat = hospital.lat || (hospital.nodes && hospital.nodes[0].lat);
         const lon = hospital.lon || (hospital.nodes && hospital.nodes[0].lon);
 
         if (lat && lon) {
-            const popupContent = `
+          const popupContent = `
       <div>
         <p>${hospital.tags.name || "Unnamed hospital"}</p>
         <a href="https://maps.google.com/?q=${lat},${lon}" target="_blank" rel="noopener noreferrer">Get Directions</a>
       </div>
     `;
-          L.marker([lat, lon])
+          const mark = L.marker([lat, lon])
             .addTo(mapInstance.current)
             .bindPopup(popupContent);
+
+          markersArray.current.push(mark)
+          
+          mark.on("click", async () => {
+            if (routingControlRef.current) {
+              routingControlRef.current.remove();
+            }
+            const directionsLink = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${lat},${lon}&travelmode=driving`;
+            setDirectionsUrl(directionsLink);
+            await getPlaceName(lat, lon);
+
+            routingControlRef.current = L.Routing.control({
+              waypoints: [
+                L.latLng(latitude, longitude),
+                L.latLng(lat, lon)
+              ],
+              createMarker: function() { return null; },
+              routeWhileDragging: true
+            }).addTo(mapInstance.current);
+          });
         }
       });
     } catch (error) {
       console.error("Error fetching hospitals:", error);
     }
   };
-
+  
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -154,7 +176,6 @@ function Map() {
           setCoordinates(currentCoordinates);
           mapInstance.current.setView(currentCoordinates, 13);
           mapMarker(latitude, longitude);
-          fetchNearbyHospitals(latitude, longitude);
         },
         () => {
           alert("Unable to retrieve your location.");
@@ -236,17 +257,16 @@ function Map() {
       <div ref={mapRef} className="h-60 w-1/2 resize"></div>
       <p>Coordinates: {coordinates.join(", ")}</p>
       <p>Current Location: {currentLocationName}</p>
-
-      <div>
-        <h3>Distances to Predefined Locations:</h3>
-        <ul>
-          {distances.map((item, index) => (
-            <li key={index}>
-              {item.name}: {item.distance} km
-            </li>
-          ))}
-        </ul>
-      </div>
+      {directionsUrl && (
+            <a
+              href={directionsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white bg-blue-500 hover:bg-blue-600 focus:outline-none font-medium rounded-lg text-sm px-4 py-2"
+            >
+              Get Directions
+            </a>
+          )}
     </div>
   );
 }

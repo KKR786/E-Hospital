@@ -33,6 +33,61 @@ function Sidebar() {
 
           <li>
             <Link
+              to="/find/doctor"
+              className="flex items-center p-2 rounded-lg text-white hover:text-gray-900 hover:bg-gray-100 group"
+            >
+              <svg
+                className="w-5 h-5 transition duration-75 text-gray-400 group-hover:text-gray-900"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path xmlns="http://www.w3.org/2000/svg" d="m19 5h-3v-1a3 3 0 0 0 -3-3h-2a3 3 0 0 0 -3 3v1h-3a5.006 5.006 0 0 0 -5 5v8a5.006 5.006 0 0 0 5 5h14a5.006 5.006 0 0 0 5-5v-8a5.006 5.006 0 0 0 -5-5zm-9-1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1h-4zm5 11h-2v2a1 1 0 0 1 -2 0v-2h-2a1 1 0 0 1 0-2h2v-2a1 1 0 0 1 2 0v2h2a1 1 0 0 1 0 2z"/>
+              </svg>
+              <span className="ms-3">Find Doctor</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/find/blood"
+              className="flex items-center p-2 rounded-lg text-white hover:text-gray-900 hover:bg-gray-100 group"
+            >
+              <svg
+                className="w-5 h-5 transition duration-75 text-gray-400 group-hover:text-gray-900"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path xmlns="http://www.w3.org/2000/svg" d="m20.499,9h-.002c-.936,0-1.837-.366-2.473-1.002-.66-.658-1.024-1.537-1.024-2.474s.361-1.812,1.019-2.468l2.481-2.428,2.467,2.414c.669.669,1.033,1.548,1.033,2.482s-.364,1.814-1.025,2.475c-.637.636-1.539,1.001-2.476,1.001ZM3.564,5.257l2.163,2.023-.844.844c-1.17,1.17-1.17,3.073,0,4.243l8.707,8.707h6s2.957,2.957,2.957,2.957l1.414-1.414-2.957-2.957v-6s-1.302-1.302-1.302-1.302l-3.207,3.207-1.414-1.414,3.207-3.207-1.586-1.586-3.207,3.207-1.414-1.414,3.207-3.207-1.586-1.586-3.207,3.207-1.414-1.414,3.206-3.206c-1.171-1.162-3.066-1.159-4.233.008l-.913.913-2.178-2.038,2.255-2.305L5.789.124.039,5.999l1.43,1.398,2.095-2.141Z"/>
+              </svg>
+              <span className="ms-3">Get Blood</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/find/therapist"
+              className="flex items-center p-2 rounded-lg text-white hover:text-gray-900 hover:bg-gray-100 group"
+            >
+              <svg
+                className="w-5 h-5 transition duration-75 text-gray-400 group-hover:text-gray-900"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path xmlns="http://www.w3.org/2000/svg" d="M11,11c0,.5-.647,1-1,1-1.657,0-3-1.343-3-3,0-.277,.05-.541,.12-.796-.676-.501-1.12-1.298-1.12-2.204,0-1.114,.665-2.067,1.617-2.5-.068-.24-.117-.488-.117-.75,0-1.519,1.231-2.75,2.75-2.75,.263,0,.75,0,.75,1V11Zm7-5c0-1.114-.665-2.067-1.617-2.5,.068-.24,.117-.488,.117-.75,0-1.519-1.231-2.75-2.75-2.75-.263,0-.75,0-.75,1V11c0,1,.647,1,1,1,1.657,0,3-1.343,3-3,0-.277-.05-.541-.12-.796,.676-.501,1.12-1.298,1.12-2.204ZM5.565,16.687l2.487,2.532c.122-1.225,.669-2.378,1.587-3.212l.874-.794-1.813-1.646c-1.017-.923-2.668-.721-3.407,.533-.48,.815-.331,1.858,.272,2.586ZM1.5,6c.828,0,1.5,.672,1.5,1.5v7.5s.011,0,.011,0c-.05,1.022,.267,2.061,.956,2.893l4.033,4.107v1c0,.552-.448,1-1,1H3.691c-.281,0-.549-.118-.738-.326l-.598-.654C.84,21.362,0,19.197,0,16.95V7.5c0-.828,.672-1.5,1.5-1.5Zm9.483,11.487l4.317-3.92c1.017-.923,2.668-.721,3.407,.533,.48,.815,.331,1.858-.272,2.586l-2.548,2.573c-.384,.388-.383,1.014,.003,1.4h0c.389,.389,1.02,.387,1.407-.004l2.735-2.763c.689-.832,1.005-1.871,.956-2.893h.011V7.5c0-.828,.672-1.5,1.5-1.5s1.5,.672,1.5,1.5v9.45c0,2.246-.84,4.412-2.355,6.07l-.598,.654c-.189,.207-.457,.326-.738,.326H11c-.552,0-1-.448-1-1v-3.292c0-.846,.357-1.652,.983-2.221Z"/>
+              </svg>
+              <span className="ms-3">Find Therapist</span>
+            </Link>
+          </li>
+
+          {(user.role === 'Supreme' || user.role === 'Admin') && <>
+            <li className="text-[#ced4da] mt-6 p-[1.5rem_0.5rem_0.375rem]">Super Admin Tools</li>
+
+            <li>
+            <Link
               to="/user-management"
               className="flex items-center p-2 rounded-lg text-white hover:text-gray-900 hover:bg-gray-100 group"
             >
@@ -64,50 +119,8 @@ function Sidebar() {
               <span className="ms-3">Role Management</span>
             </Link>
           </li>
-          <li>
-            <Link
-              to="/task-management"
-              className="flex items-center p-2 rounded-lg text-white hover:text-gray-900 hover:bg-gray-100 group"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 transition duration-75 text-gray-400 group-hover:text-gray-900"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path xmlns="http://www.w3.org/2000/svg" d="M0,18c0,2.757,2.243,5,5,5h14c2.757,0,5-2.243,5-5V10H0v8Zm14-5h4c.553,0,1,.448,1,1s-.447,1-1,1h-4c-.553,0-1-.447-1-1s.447-1,1-1Zm0,5h4c.553,0,1,.447,1,1s-.447,1-1,1h-4c-.553,0-1-.447-1-1s.447-1,1-1ZM5.027,12.995c.38-.402,1.013-.418,1.413-.039l1.015,.96,1.838-1.838c.391-.391,1.023-.391,1.414,0s.391,1.023,0,1.414l-1.982,1.982c-.352,.352-.809,.528-1.266,.528-.441,0-.883-.164-1.23-.493l-1.163-1.103c-.401-.379-.418-1.012-.038-1.413Zm0,5c.38-.401,1.013-.418,1.413-.038l1.015,.96,1.838-1.838c.391-.391,1.023-.391,1.414,0s.391,1.023,0,1.414l-1.982,1.982c-.352,.352-.809,.528-1.266,.528-.441,0-.883-.164-1.23-.493l-1.163-1.103c-.401-.379-.418-1.013-.038-1.413ZM19,1H5C2.243,1,0,3.243,0,6v2H24v-2c0-2.757-2.243-5-5-5ZM4.5,6c-.828,0-1.5-.672-1.5-1.5s.672-1.5,1.5-1.5,1.5,.672,1.5,1.5-.672,1.5-1.5,1.5Zm4,0c-.828,0-1.5-.672-1.5-1.5s.672-1.5,1.5-1.5,1.5,.672,1.5,1.5-.672,1.5-1.5,1.5Z"/>
-              </svg>
-              <span className="ms-3">Task Management</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/site-config"
-              className="flex items-center p-2 rounded-lg text-white hover:text-gray-900 hover:bg-gray-100 group"
-            >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 transition duration-75 text-gray-400 group-hover:text-gray-900" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" fill="currentColor">
-                <path d="m7.3,9.862l1.411-.813c.605.652,1.393,1.125,2.289,1.33v1.621h2v-1.621c.896-.205,1.685-.678,2.289-1.33l1.411.813.998-1.733-1.416-.816c.129-.418.218-.853.218-1.313s-.089-.895-.218-1.313l1.416-.816-.998-1.733-1.411.813c-.605-.652-1.393-1.125-2.289-1.33V0h-2v1.621c-.896.205-1.685.678-2.289,1.33l-1.411-.813-.998,1.733,1.416.816c-.129.418-.218.853-.218,1.313s.089.895.218,1.313l-1.416.816.998,1.733Zm4.7-5.362c.827,0,1.5.673,1.5,1.5s-.673,1.5-1.5,1.5-1.5-.673-1.5-1.5.673-1.5,1.5-1.5Zm1,16.5v1h4v2H7v-2h4v-1H0v-13c0-1.654,1.346-3,3-3h1.069c-.041.328-.069.661-.069,1,0,4.418,3.582,8,8,8s8-3.582,8-8c0-.339-.028-.672-.069-1h1.069c1.654,0,3,1.346,3,3v13h-11Z"/>
-              </svg>
-              <span className="flex-1 ms-3 whitespace-nowrap">Site Configuration</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/products"
-              className="flex items-center p-2 rounded-lg text-white hover:text-gray-900 hover:bg-gray-100 group"
-            >
-              <svg
-                className="w-5 h-5 transition duration-75 text-gray-400 group-hover:text-gray-900"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 18 20"
-              >
-                <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z" />
-              </svg>
-              <span className="flex-1 ms-3 whitespace-nowrap">Products</span>
-            </Link>
-          </li>
+          </>
+          }
           {!user && (
             <li>
               <Link

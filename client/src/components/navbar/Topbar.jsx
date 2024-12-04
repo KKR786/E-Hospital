@@ -43,7 +43,7 @@ function Topbar() {
             <Link href="/" className="flex ms-2 md:me-24">
               {/* img */}
               <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-white">
-                RBAC
+                E-Hospital
               </span>
             </Link>
           </div>
