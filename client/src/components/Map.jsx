@@ -6,6 +6,8 @@ import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 
 function Map() {
+  const [showFilter, setShowFilter] = useState(false);
+  const [coverage, setCoverage] = useState(5);
   const [coordinates, setCoordinates] = useState([0, 0]);
   const [place, setPlace] = useState("");
   const [currentLocationName, setCurrentLocationName] = useState("");
@@ -216,7 +218,7 @@ function Map() {
           <input
             type="text"
             id="search"
-            className="block w-full p-2 ps-10 pe-10 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="block w-full p-2 ps-10 pe-10 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
             placeholder="Search for a place (e.g., Dhaka)"
             value={place}
             onChange={handleInputChange}
@@ -252,9 +254,24 @@ function Map() {
             <span> Use Current Location</span>
           </button>
         </div>
+        <div className="">
+          <button className="text-white bg-gray-600 hover:bg-gray-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center" onClick={() => setShowFilter(!showFilter)}>Filter</button>
+        </div>
       </div>
+      {showFilter && 
+        <div className="flex my-3">
+          <div>
+            <label htmlFor="area">Area cover (km):</label>
+            <div className="relative mt-1">
+              <input className="block w-full p-2 pe-10 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none" min={1} name='area' type="number" placeholder="5" value={coverage} onChange={(e) => setCoverage(Math.max(1, e.target.value))}/>
+              <span className="absolute inset-y-0 end-0 flex items-center pe-3">km</span>
+            </div>
+          </div>
+        </div>
+      }
 
-      <div ref={mapRef} className="h-60 w-1/2 resize"></div>
+      <div ref={mapRef} className="h-60 w-1/2 resize border-2 border-black"></div>
+
       <p>Coordinates: {coordinates.join(", ")}</p>
       <p>Current Location: {currentLocationName}</p>
       {directionsUrl && (
