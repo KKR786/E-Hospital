@@ -48,23 +48,29 @@ function Topbar() {
             </Link>
           </div>
           <div className="flex items-center">
-            <div className="flex items-center ms-3">
+            <div className="flex items-center gap-x-10 ms-3">
+            <div className="relative inline-block hover:opacity-55">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-6 w-6 text-white cursor-pointer" fill="currentColor">
+                <path d="M23.608,17.013l-2.8-10.1A9.443,9.443,0,0,0,2.486,7.4L.321,17.14a2.5,2.5,0,0,0,2.441,3.042H6.905a5.285,5.285,0,0,0,10.154,0H21.2a2.5,2.5,0,0,0,2.409-3.169Zm-20.223.169,2.03-9.137a6.443,6.443,0,0,1,12.5-.326l2.628,9.463Z"/>
+              </svg>
+              <span className="absolute top-[-7px] right-[-10px] rounded-full bg-red-600 text-white text-[10px] p-[1px_5px]">45</span>
+            </div>
               <div className="relative">
                 <button
                   type="button"
-                  className="flex text-sm bg-gray-800 rounded-full"
+                  className="flex text-sm rounded-full"
                   aria-expanded="false"
                   data-dropdown-toggle="dropdown-user"
                   onClick={() => setOpenMenu(!openMenu)}
                 >
                   <span className="sr-only">Open user menu</span>
                   <img
-                    className="w-8 h-8 rounded-full"
+                    className="w-8 h-8 rounded-full hover:opacity-55"
                     src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtRs_rWILOMx5-v3aXwJu7LWUhnPceiKvvDg&s"
                     alt="user photo"
                   />
                 </button>
-                {!user.address && <svg xmlns="http://www.w3.org/2000/svg" className="absolute top-0 right-0 h-3 w-3 text-yellow-600" fill="currentColor" viewBox="0 0 24 24" width="512" height="512"><path d="m22.536,8.46L15.537,1.459C14.592.515,13.337-.006,12.001-.006s-2.592.521-3.536,1.465L1.466,8.46c-1.949,1.949-1.949,5.12,0,7.069l6.999,7.001c.944.944,2.2,1.465,3.536,1.465s2.591-.521,3.536-1.465l6.999-7.001c.944-.944,1.464-2.199,1.464-3.534s-.52-2.591-1.464-3.535Zm-11.536-1.46c0-.553.448-1,1-1s1,.447,1,1v5.5c0,.553-.448,1-1,1s-1-.447-1-1v-5.5Zm1,11c-.828,0-1.5-.672-1.5-1.5s.672-1.5,1.5-1.5,1.5.672,1.5,1.5-.672,1.5-1.5,1.5Z"/></svg>}
+                {!user.address && <svg xmlns="http://www.w3.org/2000/svg" className="absolute top-[-5px] right-[-6px] h-4 w-4 text-yellow-600" fill="currentColor" viewBox="0 0 24 24"><path d="m22.536,8.46L15.537,1.459C14.592.515,13.337-.006,12.001-.006s-2.592.521-3.536,1.465L1.466,8.46c-1.949,1.949-1.949,5.12,0,7.069l6.999,7.001c.944.944,2.2,1.465,3.536,1.465s2.591-.521,3.536-1.465l6.999-7.001c.944-.944,1.464-2.199,1.464-3.534s-.52-2.591-1.464-3.535Zm-11.536-1.46c0-.553.448-1,1-1s1,.447,1,1v5.5c0,.553-.448,1-1,1s-1-.447-1-1v-5.5Zm1,11c-.828,0-1.5-.672-1.5-1.5s.672-1.5,1.5-1.5,1.5.672,1.5,1.5-.672,1.5-1.5,1.5Z"/></svg>}
               </div>
 
               {openMenu && 

@@ -9,6 +9,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import GetBlood from "./pages/GetBlood";
+import GetDoctors from "./pages/GetDoctors";
+import Profile from "./pages/Profile";
 
 function App() {
   const { user } = useAuthContext();
@@ -23,7 +25,10 @@ function App() {
               <Route path="/signup" element={!user ? <Register /> : <Navigate to='/' />} />
               
               <Route path="/" element={user ? <Dashboard /> : <Navigate to='/login' />} />
-              <Route path="/find/blood" element={<GetBlood />} />
+              <Route path="/find/blood" element={user ? <GetBlood /> : <Navigate to='/login' />} />
+              <Route path="/find/doctor" element={user ? <GetDoctors /> : <Navigate to='/login' />} />
+              <Route path="/find/therapist" element={user ? <GetDoctors /> : <Navigate to='/login' />} />
+              <Route path="/profile" element={user ? <Profile /> : <Navigate to='/login' />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
