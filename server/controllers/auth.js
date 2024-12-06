@@ -16,8 +16,8 @@ const getUsers = async (req, res) => {
 
 //specific User
 const getUser = async (req, res) => {
-  const id = req.query;
-  const user = await User.findOne({ _id: id });
+  const id = req.params;
+  const user = await User.findOne({ _id: id }).select('-password');
 
   if (!user) {
     return res.status(404).json({ message: "User not found" });
