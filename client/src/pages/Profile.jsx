@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { useAuthContext } from "../hooks/useAuth";
+import { searchPlace } from '../helper';
 
 function Profile() {
     const { user } = useAuthContext();
     const [userData, setUserData] = useState([]);
+    const [place, setPlace] = useState('');
 
     React.useEffect(() => {
         const userInfo = async () => {
@@ -21,6 +23,13 @@ function Profile() {
             userInfo();
         }
       }, [user]);
+
+      const onChangePlace = async(e) => {
+        setPlace(e.target.value);
+        const coordinates = await searchPlace(place);
+        const {lat, lon} = coordinates[0]
+        console.log(lat, lon);
+      }
   return (
     <div className="px-4 py-10 bg-gray-50">
       <div className="flex items-center">
@@ -113,7 +122,7 @@ function Profile() {
             </div>
             <div className="relative">
                 <label htmlFor="address" className="absolute top-[-13px] left-3 bg-gray-50">Address</label>
-                <input className={`block w-full p-2 ps-3 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 ${!userData?.address ? 'focus:ring-yellow-600 focus:border-yellow-600' : 'focus:ring-blue-500 focus:border-blue-500'} focus:outline-none`} autoFocus={!userData?.address} type="text" name="address" value={userData?.address?.place} />
+                <input className={`block w-full p-2 ps-3 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 ${!userData?.address ? 'focus:ring-yellow-600 focus:border-yellow-600' : 'focus:ring-blue-500 focus:border-blue-500'} focus:outline-none`} autoFocus={!userData?.address} type="text" name="address" value={userData?.address?.place} onChange={onChangePlace}/>
             </div>
         </div>}
     </div>

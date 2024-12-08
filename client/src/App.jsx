@@ -7,10 +7,12 @@ import Nav from "./components/navbar/Nav";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import NotFound from "./pages/NotFound";
+import NotFound from "./ui/NotFound";
 import GetBlood from "./pages/GetBlood";
 import GetDoctors from "./pages/GetDoctors";
 import Profile from "./pages/Profile";
+import UserManagement from "./pages/admin/UserManagement";
+import Restricted from "./ui/Restricted";
 
 function App() {
   const { user } = useAuthContext();
@@ -29,6 +31,8 @@ function App() {
               <Route path="/find/doctor" element={user ? <GetDoctors /> : <Navigate to='/login' />} />
               <Route path="/find/therapist" element={user ? <GetDoctors /> : <Navigate to='/login' />} />
               <Route path="/profile" element={user ? <Profile /> : <Navigate to='/login' />} />
+
+              <Route path="/user-management" element={user ? (user?.role != 'Member' ? <UserManagement /> : <Restricted />) : <Navigate to='/login' />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
