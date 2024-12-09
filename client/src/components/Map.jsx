@@ -5,7 +5,7 @@ import redMarker from "../assets/red-marker.png";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 
-function Map() {
+function Map({ query }) {
   const [showFilter, setShowFilter] = useState(false);
   const [coverage, setCoverage] = useState(5);
   const [coordinates, setCoordinates] = useState([0, 0]);
@@ -19,7 +19,7 @@ function Map() {
   const markerRef = useRef(null);
   const markersArray = useRef([]);
   const routingControlRef = useRef(null);
-
+  console.log(query);
   useEffect(() => {
     if (!mapInstance.current) {
       mapInstance.current = L.map(mapRef.current).setView(
@@ -125,7 +125,9 @@ function Map() {
       const data = await response.json();
       const hospitals = data.elements;
 
-      markersArray.current.forEach((marker) => mapInstance.current.removeLayer(marker));
+      markersArray.current.forEach((marker) =>
+        mapInstance.current.removeLayer(marker)
+      );
       markersArray.current = [];
 
       hospitals.forEach((hospital) => {
@@ -143,8 +145,8 @@ function Map() {
             .addTo(mapInstance.current)
             .bindPopup(popupContent);
 
-          markersArray.current.push(mark)
-          
+          markersArray.current.push(mark);
+
           mark.on("click", async () => {
             if (routingControlRef.current) {
               routingControlRef.current.remove();
@@ -154,12 +156,11 @@ function Map() {
             await getPlaceName(lat, lon);
 
             routingControlRef.current = L.Routing.control({
-              waypoints: [
-                L.latLng(latitude, longitude),
-                L.latLng(lat, lon)
-              ],
-              createMarker: function() { return null; },
-              routeWhileDragging: true
+              waypoints: [L.latLng(latitude, longitude), L.latLng(lat, lon)],
+              createMarker: function () {
+                return null;
+              },
+              routeWhileDragging: true,
             }).addTo(mapInstance.current);
           });
         }
@@ -168,7 +169,7 @@ function Map() {
       console.error("Error fetching hospitals:", error);
     }
   };
-  
+
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -193,97 +194,145 @@ function Map() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="flex space-x-4 my-5">
-        <div className="flex-1 relative hidden md:block">
-          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            <svg
-              className="w-4 h-4 text-gray-500 dark:text-gray-400"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 20 20"
+    <div className="flex flex-col items-center justify-center py-4">
+      <div className="flex items-center gap-x-4">
+        {query === "blood" && (
+          <div className="relative">
+            <label
+              htmlFor="bloodGroup"
+              className="absolute top-[-13px] left-3 bg-gray-50"
             >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-              />
-            </svg>
-            <span className="sr-only">Search icon</span>
+              Blood Group
+            </label>
+            <select
+              name="bloodGroup"
+              id="bloodGroup"
+              className="rounded-lg block w-full p-2 bg-gray-50 border-[2.5px] border-gray-300 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="">Select Blood Group</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
           </div>
+        )}
 
-          <input
-            type="text"
-            id="search"
-            className="block w-full p-2 ps-10 pe-10 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-            placeholder="Search for a place (e.g., Dhaka)"
-            value={place}
-            onChange={handleInputChange}
-          />
-          <button
-            className="absolute inset-y-0 end-0 flex items-center pe-3"
-            onClick={searchPlace}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              id="arrow-circle-down"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-6 h-6 text-green-600 hover:text-green-700"
+        <div className="flex items-center space-x-4 my-5">
+          <div className="flex-1 relative hidden md:block">
+            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+              <svg
+                className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                />
+              </svg>
+              <span className="sr-only">Search icon</span>
+            </div>
+
+            <input
+              type="text"
+              id="search"
+              className="block w-full p-2 ps-10 pe-10 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+              placeholder="Select your place (e.g., Dhaka)"
+              value={place}
+              onChange={handleInputChange}
+            />
+            <button
+              className="absolute inset-y-0 end-0 flex items-center pe-3"
+              onClick={searchPlace}
             >
-              <path d="M0,12A12,12,0,1,0,12,0,12.013,12.013,0,0,0,0,12ZM14.535,6.293l3.586,3.586h0a3,3,0,0,1,0,4.243l-3.586,3.585-.025.024a1,1,0,1,1-1.389-1.438L16.414,13,6,13.007a1,1,0,1,1,0-2L16.413,11,13.121,7.707a1,1,0,1,1,1.414-1.414Z" />
-            </svg>
-          </button>
-        </div>
-        <div className="flex-1">
-          <button
-            onClick={getCurrentLocation}
-            className="flex items-center gap-x-2 text-white bg-gray-600 hover:bg-gray-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5 text-white"
-              fill="currentColor"
-              viewBox="0 0 24 24"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                id="arrow-circle-down"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6 text-green-600 hover:text-green-700"
+              >
+                <path d="M0,12A12,12,0,1,0,12,0,12.013,12.013,0,0,0,0,12ZM14.535,6.293l3.586,3.586h0a3,3,0,0,1,0,4.243l-3.586,3.585-.025.024a1,1,0,1,1-1.389-1.438L16.414,13,6,13.007a1,1,0,1,1,0-2L16.413,11,13.121,7.707a1,1,0,1,1,1.414-1.414Z" />
+              </svg>
+            </button>
+          </div>
+          <span>Or</span>
+          <div className="flex-1">
+            <button
+              onClick={getCurrentLocation}
+              className="flex items-center gap-x-2 text-white bg-gray-600 hover:bg-gray-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             >
-              <path d="m16.949,2.05c-1.321-1.322-3.079-2.05-4.949-2.05s-3.628.728-4.95,2.05c-2.729,2.729-2.729,7.17.008,9.907l2.495,2.44c.675.66,1.561.99,2.447.99s1.772-.33,2.447-.99l2.502-2.448c1.322-1.322,2.051-3.08,2.051-4.95s-.729-3.627-2.051-4.95Zm-4.949,7.94c-1.657,0-3-1.343-3-3s1.343-3,3-3,3,1.343,3,3-1.343,3-3,3Zm12,6.772c.002.354-.183.682-.485.863l-9.861,5.917c-.51.306-1.082.459-1.653.459s-1.144-.153-1.653-.459L.485,17.625c-.303-.182-.487-.51-.485-.863.002-.353.19-.679.495-.857l4.855-2.842c.1.11.203.219.309.325l2.495,2.439c1.028,1.006,2.395,1.561,3.846,1.561s2.817-.555,3.846-1.561l2.518-2.463c.098-.098.194-.199.287-.301l4.854,2.841c.305.179.493.505.495.857Z" />
-            </svg>
-            <span> Use Current Location</span>
-          </button>
-        </div>
-        <div className="">
-          <button className="text-white bg-gray-600 hover:bg-gray-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center" onClick={() => setShowFilter(!showFilter)}>Filter</button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="m16.949,2.05c-1.321-1.322-3.079-2.05-4.949-2.05s-3.628.728-4.95,2.05c-2.729,2.729-2.729,7.17.008,9.907l2.495,2.44c.675.66,1.561.99,2.447.99s1.772-.33,2.447-.99l2.502-2.448c1.322-1.322,2.051-3.08,2.051-4.95s-.729-3.627-2.051-4.95Zm-4.949,7.94c-1.657,0-3-1.343-3-3s1.343-3,3-3,3,1.343,3,3-1.343,3-3,3Zm12,6.772c.002.354-.183.682-.485.863l-9.861,5.917c-.51.306-1.082.459-1.653.459s-1.144-.153-1.653-.459L.485,17.625c-.303-.182-.487-.51-.485-.863.002-.353.19-.679.495-.857l4.855-2.842c.1.11.203.219.309.325l2.495,2.439c1.028,1.006,2.395,1.561,3.846,1.561s2.817-.555,3.846-1.561l2.518-2.463c.098-.098.194-.199.287-.301l4.854,2.841c.305.179.493.505.495.857Z" />
+              </svg>
+              <span> Use Current Location</span>
+            </button>
+          </div>
+          <div className="">
+            <button
+              className="text-white bg-gray-600 hover:bg-gray-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              onClick={() => setShowFilter(!showFilter)}
+            >
+              Filter
+            </button>
+          </div>
         </div>
       </div>
-      {showFilter && 
+      {showFilter && (
         <div className="flex my-3">
           <div>
             <label htmlFor="area">Area cover (km):</label>
             <div className="relative mt-1">
-              <input className="block w-full p-2 pe-10 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none" min={1} name='area' type="number" placeholder="5" value={coverage} onChange={(e) => setCoverage(Math.max(1, e.target.value))}/>
-              <span className="absolute inset-y-0 end-0 flex items-center pe-3">km</span>
+              <input
+                className="block w-full p-2 pe-10 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                min={1}
+                name="area"
+                type="number"
+                placeholder="5"
+                value={coverage}
+                onChange={(e) => setCoverage(Math.max(1, e.target.value))}
+              />
+              <span className="absolute inset-y-0 end-0 flex items-center pe-3">
+                km
+              </span>
             </div>
           </div>
         </div>
-      }
+      )}
 
-      <div ref={mapRef} className="h-60 w-1/2 resize border-2 border-black"></div>
+      <div
+        ref={mapRef}
+        className="h-60 w-1/2 resize border-2 border-black"
+      ></div>
 
       <p>Coordinates: {coordinates.join(", ")}</p>
       <p>Current Location: {currentLocationName}</p>
       {directionsUrl && (
-            <a
-              href={directionsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white bg-blue-500 hover:bg-blue-600 focus:outline-none font-medium rounded-lg text-sm px-4 py-2"
-            >
-              Get Directions
-            </a>
-          )}
+        <a
+          href={directionsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-white bg-blue-500 hover:bg-blue-600 focus:outline-none font-medium rounded-lg text-sm px-4 py-2"
+        >
+          Get Directions
+        </a>
+      )}
     </div>
   );
 }

@@ -1,12 +1,12 @@
 import React from 'react'
 import Map from '../components/Map'
 
-function GetBlood() {
+function GetTherapists() {
   return (
     <div>
-      <Map query='blood'/>
+      <Map query='therapist' />
     </div>
   )
 }
 
-export default GetBlood
+export default GetTherapists
