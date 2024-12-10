@@ -1,4 +1,5 @@
 import { createContext, useReducer, useEffect, useState } from 'react';
+import { isTokenExpired } from '../helper';
 
 export const AuthContext = createContext()
 
@@ -26,7 +27,13 @@ export const AuthContextProvider = ({ children }) => {
     const user = JSON.parse(localStorage.getItem('user'))
 
     if (user) {
-      dispatch({ type: 'LOGIN', payload: user }) 
+      if (isTokenExpired(user.token)) {
+        localStorage.removeItem('user');
+        dispatch({ type: 'LOGOUT' });
+        window.location.href = '/login';
+      } else {
+        dispatch({ type: 'LOGIN', payload: user });
+      }
     }
 
     setLoading(false);
