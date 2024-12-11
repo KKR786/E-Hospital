@@ -11,7 +11,6 @@ function Register() {
     email: "",
     name: "",
     bloodGroup: "",
-    address: "",
     phoneNumber: "",
     userType: "",
     department: "",
