@@ -35,6 +35,7 @@ const loginUser = async (req, res) => {
     // create a token
     const token = createToken(user._id);
     const name = user.name;
+    const address = user?.address
     const role = user.role;
     const id = user._id;
     const joined = new Date(user.createdAt.toString());
@@ -45,7 +46,7 @@ const loginUser = async (req, res) => {
       "-" +
       joined.toLocaleString("en-US", { day: "2-digit" });
 
-    res.status(200).json({ email, token, name, role, id, joiningDate });
+    res.status(200).json({ email, token, name, address, role, id, joiningDate });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -60,7 +61,6 @@ const signupUser = async (req, res) => {
     password,
     role,
     bloodGroup,
-    address,
     phoneNumber,
     userType,
     department,
@@ -73,7 +73,6 @@ const signupUser = async (req, res) => {
       email,
       name,
       bloodGroup,
-      address,
       phoneNumber,
       userType,
       department,

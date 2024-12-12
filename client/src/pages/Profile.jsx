@@ -8,10 +8,10 @@ function Profile() {
   const { user } = useAuthContext();
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [userData, setUserData] = useState([]);
+  const [userData, setUserData] = useState({});
 
-  const [department, setDepartment] = useState('')
-  const [degree, setDegree] = useState('')
+  const [department, setDepartment] = useState('');
+  const [degree, setDegree] = useState('');
   const [blood, setBlood] = useState(false);
   const [place, setPlace] = useState("");
   const [address, setAddress] = useState({
@@ -21,13 +21,33 @@ function Profile() {
     country: "",
   });
   const [formData, setFormData] = useState({
-    email: "",
-    name: "",
-    bloodGroup: "",
-    phoneNumber: "",
-    userType: "",
-    password: "",
+    email: '',
+    name: '',
+    bloodGroup: '',
+    phoneNumber: '',
+    userType: '',
   });
+
+  const extractAddress = (place) => {
+    const parts = place.split(',');
+
+    if (parts.length >= 3) {
+      const street = parts[0].trim();
+      const cityZip = parts[1].trim();
+      const country = parts[2].trim();
+
+      const cityParts = cityZip.split('-');
+      const city = cityParts[0].trim();
+      const zip = cityParts[1] ? cityParts[1].trim() : '';
+
+      setAddress({
+        street,
+        city,
+        zip,
+        country,
+      });
+    }
+  }
 
   React.useEffect(() => {
     const userInfo = async () => {
@@ -46,11 +66,30 @@ function Profile() {
     }
   }, [user]);
 
-  const onChangePlace = async (e) => {
-    setPlace(e.target.value);
-    const coordinates = await searchPlace(place);
-    const { lat, lon } = coordinates[0];
-    console.log(lat, lon);
+  React.useEffect(() => {
+    if (userData.email) {
+      setFormData({
+        email: userData.email || '',
+        name: userData.name || '',
+        bloodGroup: userData.bloodGroup || '',
+        phoneNumber: userData.phoneNumber || '',
+        userType: userData.userType || '',
+      });
+
+      setDepartment(userData.department || '');
+      setDegree(userData.degree || '');
+      setBlood(userData.willDonateBlood || false);
+
+      extractAddress(userData.address.place);
+    }
+  }, [userData]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   const handleAddressChange = (e) => {
@@ -69,6 +108,15 @@ function Profile() {
       return;
     }
 
+    const place = address.street +
+    ", " +
+    address.city +
+    "-" +
+    address.zip +
+    ", " +
+    address.country;
+    const coordinates = await searchPlace(place);
+    
     const data = new FormData();
 
     Object.entries(formData).forEach(([key, value]) => {
@@ -76,23 +124,35 @@ function Profile() {
     });
 
     data.append("willDonateBlood", blood);
+    data.append('address[place]', place);
+    data.append('address[coordinates][]', coordinates[0].lon);
+    data.append('address[coordinates][]', coordinates[0].lat);
 
     if(formData.userType !== 'User') {
       data.append("department", department);
       data.append("degree", degree);
     }
 
+    const res = await fetch(`/api/protected/user/profile/${user.id}`, {
+      method: 'PATCH',
+      body: data,
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      }
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      setError(json.error);
+      setSuccess('')
+    }
+    if (res.ok) {
+      setSuccess('Profile Updated Successfully')
+      setError(null);
+    }
   }
   
-  console.log(
-    address.street +
-      ", " +
-      address.city +
-      "-" +
-      address.zip +
-      ", " +
-      address.country
-  );
   return (
     <div className="px-4 py-10 bg-gray-50">
       <div className="flex items-center">
@@ -114,7 +174,9 @@ function Profile() {
                   className="block w-full p-2 ps-3 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
                   type="text"
                   name="name"
-                  value={userData.name}
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
               <div className="relative flex-1">
@@ -128,7 +190,9 @@ function Profile() {
                   className="block w-full p-2 ps-3 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
                   type="email"
                   name="email"
-                  value={userData.email}
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
             </div>
@@ -144,7 +208,8 @@ function Profile() {
                   name="bloodGroup"
                   id="bloodGroup"
                   className="rounded-lg block w-full p-2 bg-gray-50 border-[2.5px] border-gray-300 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
-                  value={userData.bloodGroup}
+                  value={formData.bloodGroup}
+                  onChange={handleInputChange}
                   required
                 >
                   <option value="">Select Blood Group</option>
@@ -169,7 +234,8 @@ function Profile() {
                   name="bloodGroup"
                   id="bloodGroup"
                   className="rounded-lg block w-full p-2 bg-gray-50 border-[2.5px] border-gray-300 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
-                  value={userData.userType}
+                  value={formData.userType}
+                  onChange={handleInputChange}
                   required
                 >
                   <option value="">Select User Type</option>
@@ -179,8 +245,8 @@ function Profile() {
                 </select>
               </div>
             </div>
-            {(userData.userType === "Doctor" ||
-              userData.userType === "Therapist") && (
+            {(formData.userType === "Doctor" ||
+              formData.userType === "Therapist") && (
               <div className="flex space-x-4">
                 <div className="relative flex-1">
                   <label
@@ -193,7 +259,9 @@ function Profile() {
                     className="block w-full p-2 ps-3 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
                     type="text"
                     name="department"
-                    value={userData.department}
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    required
                   />
                 </div>
                 <div className="relative flex-1">
@@ -207,7 +275,9 @@ function Profile() {
                     className="block w-full p-2 ps-3 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
                     type="text"
                     name="degree"
-                    value={userData.degree}
+                    value={degree}
+                    onChange={(e) => setDegree(e.target.value)}
+                    required
                   />
                 </div>
               </div>
@@ -224,7 +294,9 @@ function Profile() {
                   className="block w-full p-2 ps-3 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
                   type="text"
                   name="phoneNumber"
-                  value={userData.phoneNumber}
+                  value={formData.phoneNumber}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
               <div className="flex-1">
@@ -233,7 +305,8 @@ function Profile() {
                     type="checkbox"
                     name="willDonateBlood"
                     id="willDonateBlood"
-                    checked={userData.willDonateBlood}
+                    checked={blood}
+                    onChange={(e) => setBlood(e.target.checked)}
                     className="w-5 h-5"
                   />
                   <label
@@ -270,6 +343,7 @@ function Profile() {
                     name="street"
                     value={address.street}
                     onChange={handleAddressChange}
+                    required
                   />
                 </div>
 
@@ -286,6 +360,7 @@ function Profile() {
                     name="city"
                     value={address.city}
                     onChange={handleAddressChange}
+                    required
                   />
                 </div>
 
@@ -302,6 +377,7 @@ function Profile() {
                     name="zip"
                     value={address.zip}
                     onChange={handleAddressChange}
+                    required
                   />
                 </div>
 
@@ -318,6 +394,7 @@ function Profile() {
                     name="country"
                     value={address.country}
                     onChange={handleAddressChange}
+                    required
                   />
                 </div>
               </div>

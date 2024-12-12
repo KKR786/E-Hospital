@@ -115,7 +115,7 @@ userSchema.pre('save', async function (next) {
 });
 
 // Signup
-userSchema.statics.signup = async function( email, name, bloodGroup, address, phoneNumber, userType, 
+userSchema.statics.signup = async function( email, name, bloodGroup, phoneNumber, userType, 
     department, degree, willDonateBlood, dp, role, password ) {
 
   // validation
@@ -165,7 +165,6 @@ userSchema.statics.signup = async function( email, name, bloodGroup, address, ph
     email,
     name,
     bloodGroup,
-    address,
     phoneNumber,
     userType,
     department,
