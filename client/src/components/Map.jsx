@@ -10,6 +10,7 @@ function Map({ query }) {
   const [coverage, setCoverage] = useState(5);
   const [coordinates, setCoordinates] = useState([0, 0]);
   const [place, setPlace] = useState("");
+  const [bg, setBG] = useState("");
   const [currentLocationName, setCurrentLocationName] = useState("");
   const [distances, setDistances] = useState([]);
   const [directionsUrl, setDirectionsUrl] = useState("");
@@ -207,6 +208,7 @@ function Map({ query }) {
             <select
               name="bloodGroup"
               id="bloodGroup"
+              onChange={(e) => setBG(e.target.value)}
               className="rounded-lg block w-full p-2 bg-gray-50 border-[2.5px] border-gray-300 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
               required
             >

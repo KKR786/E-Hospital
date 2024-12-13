@@ -13,7 +13,6 @@ function Profile() {
   const [department, setDepartment] = useState('');
   const [degree, setDegree] = useState('');
   const [blood, setBlood] = useState(false);
-  const [place, setPlace] = useState("");
   const [address, setAddress] = useState({
     street: "",
     city: "",
@@ -80,7 +79,9 @@ function Profile() {
       setDegree(userData.degree || '');
       setBlood(userData.willDonateBlood || false);
 
-      extractAddress(userData.address.place);
+      if (userData.address) {
+        extractAddress(userData.address.place);
+      }
     }
   }, [userData]);
 

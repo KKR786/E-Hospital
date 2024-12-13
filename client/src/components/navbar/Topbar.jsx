@@ -76,7 +76,7 @@ function Topbar() {
                     alt="user photo"
                   />
                 </button>
-                {!user.address && (
+                {!user.address?.place && (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="absolute top-[-5px] right-[-6px] h-4 w-4 text-yellow-600"
@@ -125,7 +125,7 @@ function Topbar() {
                         className="flex items-center gap-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-700 hover:text-white"
                         role="menuitem"
                       >
-                        {!user.address ? (
+                        {!user.address?.place ? (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-4 w-4 text-yellow-600"

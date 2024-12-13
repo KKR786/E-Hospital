@@ -40,7 +40,7 @@ function Register() {
       [name]: value,
     }));
   };
-  console.log(formData.userType)
+  
   return (
     <section className="bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
@@ -219,22 +219,6 @@ function Register() {
                 </div>
               </div>
 
-              <div>
-                <label
-                  htmlFor="address"
-                  className="block mb-2 text-sm font-medium text-white"
-                >
-                  Address
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  id="address"
-                  onChange={handleInputChange}
-                  className="border rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Your address"
-                />
-              </div>
 
               {/* Role Input */}
               {/* <div>
