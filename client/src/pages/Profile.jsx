@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuthContext } from "../hooks/useAuth";
-import { searchPlace } from "../helper";
+import { getCoordinates } from "../helper";
 import Success from "../components/toast/Success";
 import Error from "../components/toast/Error";
 
@@ -116,7 +116,8 @@ function Profile() {
     address.zip +
     ", " +
     address.country;
-    const coordinates = await searchPlace(place);
+    const coordinates = await getCoordinates(place);
+    const [latitude, longitude] = coordinates
     
     const data = new FormData();
 
@@ -126,8 +127,8 @@ function Profile() {
 
     data.append("willDonateBlood", blood);
     data.append('address[place]', place);
-    data.append('address[coordinates][]', coordinates[0].lon);
-    data.append('address[coordinates][]', coordinates[0].lat);
+    data.append('address[coordinates][]', longitude);
+    data.append('address[coordinates][]', latitude);
 
     if(formData.userType !== 'User') {
       data.append("department", department);

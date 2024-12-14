@@ -1,9 +1,11 @@
 const User = require("../models/user");
 
-const getNearbyUsers = async (longitude, latitude, maxDistanceInMeters) => {
+const getNearbyUsers = async (req, res) => {
+  const { longitude, latitude, maxDistanceInMeters } = req.body;
+
     try {
       const nearbyUsers = await User.find({
-        coordinates: {
+        "address.coordinates": {
           $near: {
             $geometry: {
               type: 'Point',
@@ -12,12 +14,12 @@ const getNearbyUsers = async (longitude, latitude, maxDistanceInMeters) => {
             $maxDistance: maxDistanceInMeters,
           },
         },
-      });
+        bloodGroup
+      }).select('-password');
   
-      console.log('Nearby users:', nearbyUsers);
-      return nearbyUsers;
+      res.json({ nearbyUsers });
     } catch (err) {
-      console.error('Error finding nearby users:', err);
+      res.status(500).json({ message: 'Error finding nearby users', error: err.message });
     }
   };
 

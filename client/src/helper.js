@@ -7,11 +7,19 @@ export const isTokenExpired = (token) => {
   return payload.exp < currentTime;
 };
 
-export const searchPlace = async (place) => {
+export const getCoordinates = async (place) => {
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${place}`
     );
     const data = await response.json();
-    
-    return data;
+
+    if (data.length > 0) {
+      const { lat, lon } = data[0];
+      const newCoordinates = [lat, lon];
+      
+      return newCoordinates;
+    }
+    else {
+      return null;
+    }
   };

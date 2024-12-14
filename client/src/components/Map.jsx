@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from "react";
+import { useAuthContext } from "../hooks/useAuth";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import redMarker from "../assets/red-marker.png";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+import { getCoordinates } from "../helper";
 
 function Map({ query }) {
+  const { user } = useAuthContext();
   const [showFilter, setShowFilter] = useState(false);
   const [coverage, setCoverage] = useState(5);
   const [coordinates, setCoordinates] = useState([0, 0]);
@@ -57,9 +60,33 @@ function Map({ query }) {
         .openPopup();
     }
     await getPlaceName(lat, lon);
-    await fetchNearbyHospitals(lat, lon);
-    calculateDistances(lat, lon);
+    if(query === 'hospital') {
+      await fetchNearbyHospitals(lat, lon);
+    }
+    else if(query === 'blood') {
+      await fetchB(lat, lon);
+    }
+
+    // calculateDistances(lat, lon);
   };
+
+  const fetchB = async (lat, lon) => {
+    const longitude= lon
+    const latitude= lat
+    const maxDistanceInMeters= 5000
+    
+    const res = await fetch(`/api/protected/find/blood`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${user.token}`,
+                  'Content-Type': 'application/json' },
+      body: JSON.stringify({ longitude, latitude, maxDistanceInMeters })
+    });
+    const json = await res.json();
+
+    if (res.ok) {
+      console.log('test: ', json);
+    }
+  }
 
   const getPlaceName = async (latitude, longitude) => {
     const response = await fetch(
@@ -91,15 +118,12 @@ function Map({ query }) {
   //   };
 
   const searchPlace = async () => {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${place}`
-    );
-    const data = await response.json();
-    if (data.length > 0) {
-      const { lat, lon } = data[0];
-      const newCoordinates = [lat, lon];
-      setCoordinates(newCoordinates);
-      mapInstance.current.setView(newCoordinates, 13);
+    const data = await getCoordinates(place);
+
+    if (data) {
+      const [lat, lon] = data;
+      setCoordinates(data);
+      mapInstance.current.setView(data, 13);
       mapMarker(lat, lon);
     } else {
       alert("Place not found");
@@ -193,6 +217,8 @@ function Map({ query }) {
   const handleInputChange = (e) => {
     setPlace(e.target.value);
   };
+
+  console.log(bg)
 
   return (
     <div className="flex flex-col items-center justify-center py-4">
