@@ -1,7 +1,7 @@
 const User = require("../models/user");
 
 const getNearbyUsers = async (req, res) => {
-  const { longitude, latitude, maxDistanceInMeters } = req.body;
+  const { longitude, latitude, maxDistanceInMeters, bloodGroup } = req.body;
 
     try {
       const nearbyUsers = await User.find({

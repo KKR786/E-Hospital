@@ -10,10 +10,12 @@ import { getCoordinates } from "../helper";
 function Map({ query }) {
   const { user } = useAuthContext();
   const [showFilter, setShowFilter] = useState(false);
-  const [coverage, setCoverage] = useState(5);
+  const [coverage, setCoverage] = useState(5000);
   const [coordinates, setCoordinates] = useState([0, 0]);
   const [place, setPlace] = useState("");
   const [bg, setBG] = useState("");
+  const [nearByUsers, setNearByUsers] = useState([]);
+  const [showSelection, setShowSelection] = useState(false)
   const [currentLocationName, setCurrentLocationName] = useState("");
   const [distances, setDistances] = useState([]);
   const [directionsUrl, setDirectionsUrl] = useState("");
@@ -23,7 +25,7 @@ function Map({ query }) {
   const markerRef = useRef(null);
   const markersArray = useRef([]);
   const routingControlRef = useRef(null);
-  console.log(query);
+  
   useEffect(() => {
     if (!mapInstance.current) {
       mapInstance.current = L.map(mapRef.current).setView(
@@ -64,29 +66,12 @@ function Map({ query }) {
       await fetchNearbyHospitals(lat, lon);
     }
     else if(query === 'blood') {
-      await fetchB(lat, lon);
+      await fetchUsersforBlood(lat, lon, coverage, bg);
     }
 
     // calculateDistances(lat, lon);
   };
 
-  const fetchB = async (lat, lon) => {
-    const longitude= lon
-    const latitude= lat
-    const maxDistanceInMeters= 5000
-    
-    const res = await fetch(`/api/protected/find/blood`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${user.token}`,
-                  'Content-Type': 'application/json' },
-      body: JSON.stringify({ longitude, latitude, maxDistanceInMeters })
-    });
-    const json = await res.json();
-
-    if (res.ok) {
-      console.log('test: ', json);
-    }
-  }
 
   const getPlaceName = async (latitude, longitude) => {
     const response = await fetch(
@@ -129,6 +114,63 @@ function Map({ query }) {
       alert("Place not found");
     }
   };
+
+  const fetchUsersforBlood = async (lat, lon, d, bg) => {
+  
+    try {
+      const res = await fetch(`/api/protected/find/blood`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${user.token}`,
+                    'Content-Type': 'application/json' },
+        body: JSON.stringify({ longitude: lon, latitude: lat, maxDistanceInMeters: d, bloodGroup: bg })
+      });
+      const users = await res.json();
+    
+      markersArray.current.forEach((marker) =>
+        mapInstance.current.removeLayer(marker)
+      );
+      markersArray.current = [];
+    
+      if (res.ok) {
+        console.log('test: ', users);
+        const groupedUsers = {};
+
+        users.nearbyUsers.forEach((user) => {
+          const userCoordinates = user.address.coordinates;
+        const key = userCoordinates.join(",");
+
+        if (!groupedUsers[key]) {
+          groupedUsers[key] = []; 
+        }
+
+        groupedUsers[key].push(user);
+      });
+      Object.keys(groupedUsers).forEach(coordinateKey => {
+        const [lon, lat] = coordinateKey.split(",").map(coord => parseFloat(coord));
+        const usersAtLocation = groupedUsers[coordinateKey];
+
+        const popupContent = `
+          <div>
+            <h4>${usersAtLocation.length} User(s) at this location</h4>
+            <p>${user.address.place}</p>
+          </div>
+        `;
+        
+        const mark = L.marker([lat, lon])
+          .addTo(mapInstance.current)
+          .bindPopup(popupContent)
+          .on('click', () => {
+            setNearByUsers(usersAtLocation)
+            setShowSelection(true)
+          });
+
+        markersArray.current.push(mark);
+      });
+      }
+    } catch (error) {
+      
+    }
+  }
 
   const fetchNearbyHospitals = async (latitude, longitude) => {
     const radius = 5000; // 5km radius
@@ -218,7 +260,6 @@ function Map({ query }) {
     setPlace(e.target.value);
   };
 
-  console.log(bg)
 
   return (
     <div className="flex flex-col items-center justify-center py-4">
@@ -351,6 +392,15 @@ function Map({ query }) {
 
       <p>Coordinates: {coordinates.join(", ")}</p>
       <p>Current Location: {currentLocationName}</p>
+      {showSelection && 
+       <ul>
+        {nearByUsers.map((user, i) => 
+        <li key={i}>
+          <strong>{user.name}</strong> - {user.address.place}<br/>
+          <em>Blood Group: {user.bloodGroup}</em>
+        </li>)}
+       </ul>
+      }
       {directionsUrl && (
         <a
           href={directionsUrl}
