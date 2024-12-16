@@ -6,10 +6,13 @@ import redMarker from "../assets/red-marker.png";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import { getCoordinates } from "../helper";
+import Success from "../components/toast/Success";
+import Error from "../components/toast/Error";
 
 function Map({ query }) {
   const { user } = useAuthContext();
-  const [showFilter, setShowFilter] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [coverage, setCoverage] = useState(5);
   const [coordinates, setCoordinates] = useState([0, 0]);
   const [place, setPlace] = useState("");
@@ -70,7 +73,7 @@ function Map({ query }) {
     }
     await getPlaceName(lat, lon);
     if(query === 'hospital') {
-      await fetchNearbyHospitals(lat, lon);
+      await fetchNearbyHospitals(lat, lon, coverage);
     }
     else if(query === 'blood') {
       await fetchUsersforBlood(lat, lon, coverage, bg);
@@ -174,13 +177,20 @@ function Map({ query }) {
         markersArray.current.push(mark);
       });
       }
+      else {
+        setError(`${users.error}. Ex- ${users.emptyFields}`)
+
+        setTimeout(() => {
+          setError(null);
+        }, 6000);
+      }
     } catch (error) {
-      
+      setError(error)
     }
   }
 
-  const fetchNearbyHospitals = async (latitude, longitude) => {
-    const radius = 5000; // 5km radius
+  const fetchNearbyHospitals = async (latitude, longitude, d) => {
+    const radius = d * 1000; // 5km radius
     const query = `
       [out:json];
       (
@@ -270,8 +280,8 @@ function Map({ query }) {
 
   return (
     <div className="flex flex-col items-center justify-center py-4">
-      <div className="flex items-center gap-x-4">
-        {query === "blood" && (
+      <div className="flex items-center flex-col gap-x-4 mt-5">
+      {query === "blood" && (
           <div className="relative">
             <label
               htmlFor="bloodGroup"
@@ -298,8 +308,26 @@ function Map({ query }) {
             </select>
           </div>
         )}
+        
+        <div className="flex items-center space-x-4 my-5">       
+          <div className="relative">
+            <label htmlFor="area" className="absolute top-[-13px] left-3 bg-gray-50 z-10">Area Cover (km)</label>
+            <div className="relative">
+              <input
+                className="block w-full p-2 pe-10 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                min={1}
+                name="area"
+                type="number"
+                placeholder="5"
+                value={coverage}
+                onChange={(e) => setCoverage(Math.max(1, e.target.value))}
+              />
+              <span className="absolute inset-y-0 end-0 flex items-center pe-3">
+                km
+              </span>
+            </div>
+          </div>
 
-        <div className="flex items-center space-x-4 my-5">
           <div className="flex-1 relative hidden md:block">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
               <svg
@@ -328,22 +356,10 @@ function Map({ query }) {
               value={place}
               onChange={handleInputChange}
             />
-            <button
-              className="absolute inset-y-0 end-0 flex items-center pe-3"
-              onClick={searchPlace}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                id="arrow-circle-down"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-6 h-6 text-green-600 hover:text-green-700"
-              >
-                <path d="M0,12A12,12,0,1,0,12,0,12.013,12.013,0,0,0,0,12ZM14.535,6.293l3.586,3.586h0a3,3,0,0,1,0,4.243l-3.586,3.585-.025.024a1,1,0,1,1-1.389-1.438L16.414,13,6,13.007a1,1,0,1,1,0-2L16.413,11,13.121,7.707a1,1,0,1,1,1.414-1.414Z" />
-              </svg>
-            </button>
           </div>
+
           <span>Or</span>
+
           <div className="flex-1">
             <button
               onClick={getCurrentLocation}
@@ -360,37 +376,24 @@ function Map({ query }) {
               <span> Use Current Location</span>
             </button>
           </div>
-          <div className="">
-            <button
-              className="text-white bg-gray-600 hover:bg-gray-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-              onClick={() => setShowFilter(!showFilter)}
+
+          <button
+              className="flex items-center justify-center gap-x-3 text-white bg-green-600 hover:bg-green-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              onClick={searchPlace}
             >
-              Filter
+              Go
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                id="arrow-circle-down"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-5 h-5 "
+              >
+                <path d="M0,12A12,12,0,1,0,12,0,12.013,12.013,0,0,0,0,12ZM14.535,6.293l3.586,3.586h0a3,3,0,0,1,0,4.243l-3.586,3.585-.025.024a1,1,0,1,1-1.389-1.438L16.414,13,6,13.007a1,1,0,1,1,0-2L16.413,11,13.121,7.707a1,1,0,1,1,1.414-1.414Z" />
+              </svg>
             </button>
-          </div>
         </div>
       </div>
-      {showFilter && (
-        <div className="flex my-3">
-          <div>
-            <label htmlFor="area">Area cover (km):</label>
-            <div className="relative mt-1">
-              <input
-                className="block w-full p-2 pe-10 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-                min={1}
-                name="area"
-                type="number"
-                placeholder="5"
-                value={coverage}
-                onChange={(e) => setCoverage(Math.max(1, e.target.value))}
-              />
-              <span className="absolute inset-y-0 end-0 flex items-center pe-3">
-                km
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div
         ref={mapRef}
@@ -418,6 +421,9 @@ function Map({ query }) {
           Get Directions
         </a>
       )}
+      
+      {success && <Success message={success} />}
+      {error && <Error message={String(error)} />}
     </div>
   );
 }

@@ -147,11 +147,17 @@ function Profile() {
 
     if (!res.ok) {
       setError(json.error);
-      setSuccess('')
+
+      setTimeout(() => {
+        setError(null);
+      }, 6000);
     }
     if (res.ok) {
       setSuccess('Profile Updated Successfully')
-      setError(null);
+
+      setTimeout(() => {
+        setSuccess(null);
+      }, 6000);
     }
   }
   
