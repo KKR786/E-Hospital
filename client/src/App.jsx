@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import UserManagement from "./pages/admin/UserManagement";
 import Restricted from "./ui/Restricted";
 import GetTherapists from "./pages/GetTherapists";
+import FindHospitals from "./pages/FindHospitals";
 
 function App() {
   const { user } = useAuthContext();
@@ -31,6 +32,7 @@ function App() {
               <Route path="/find/blood" element={user ? <GetBlood /> : <Navigate to='/login' />} />
               <Route path="/find/doctor" element={user ? <GetDoctors /> : <Navigate to='/login' />} />
               <Route path="/find/therapist" element={user ? <GetTherapists /> : <Navigate to='/login' />} />
+              <Route path="/find/hospital" element={user ? <FindHospitals /> : <Navigate to='/login' />} />
               <Route path="/profile" element={user ? <Profile /> : <Navigate to='/login' />} />
 
               <Route path="/user-management" element={user ? (user?.role != 'Member' ? <UserManagement /> : <Restricted />) : <Navigate to='/login' />} />

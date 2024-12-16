@@ -10,7 +10,7 @@ import { getCoordinates } from "../helper";
 function Map({ query }) {
   const { user } = useAuthContext();
   const [showFilter, setShowFilter] = useState(false);
-  const [coverage, setCoverage] = useState(5000);
+  const [coverage, setCoverage] = useState(5);
   const [coordinates, setCoordinates] = useState([0, 0]);
   const [place, setPlace] = useState("");
   const [bg, setBG] = useState("");
@@ -39,10 +39,17 @@ function Map({ query }) {
       mapInstance.current.on("click", async (e) => {
         const { lat, lng } = e.latlng;
         setCoordinates([lat, lng]);
-        mapMarker(lat, lng);
+        await mapMarker(lat, lng);
       });
     }
   }, [currentLocationName]);
+
+  useEffect(() => {
+    if (bg && coordinates.length > 0) {
+      const [lat, lon] = coordinates;
+      mapMarker(lat, lon);
+    }
+  }, [bg, coordinates]);
 
   const mapMarker = async (lat, lon) => {
     const newCoordinates = [lat, lon];
@@ -116,13 +123,13 @@ function Map({ query }) {
   };
 
   const fetchUsersforBlood = async (lat, lon, d, bg) => {
-  
+
     try {
       const res = await fetch(`/api/protected/find/blood`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${user.token}`,
                     'Content-Type': 'application/json' },
-        body: JSON.stringify({ longitude: lon, latitude: lat, maxDistanceInMeters: d, bloodGroup: bg })
+        body: JSON.stringify({ longitude: lon, latitude: lat, maxDistanceInMeters: d*1000, bloodGroup: bg })
       });
       const users = await res.json();
     

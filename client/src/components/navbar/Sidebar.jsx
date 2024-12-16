@@ -33,6 +33,23 @@ function Sidebar() {
 
           <li>
             <Link
+              to="/find/hospital"
+              className="flex items-center p-2 rounded-lg text-white hover:text-gray-900 hover:bg-gray-100 group"
+            >
+              <svg
+                className="w-5 h-5 transition duration-75 text-gray-400 group-hover:text-gray-900"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path xmlns="http://www.w3.org/2000/svg" d="m15,0h-6c-2.761,0-5,2.239-5,5v16c0,1.657,1.343,3,3,3h10c1.657,0,3-1.343,3-3V5c0-2.761-2.239-5-5-5Zm-5,19h-1c-.553,0-1-.448-1-1s.447-1,1-1h1c.553,0,1,.448,1,1s-.447,1-1,1Zm0-4h-1c-.553,0-1-.448-1-1s.447-1,1-1h1c.553,0,1,.448,1,1s-.447,1-1,1Zm2-5c-.553,0-1-.448-1-1v-1h-1c-.553,0-1-.448-1-1s.447-1,1-1h1v-1c0-.552.447-1,1-1s1,.448,1,1v1h1c.553,0,1,.448,1,1s-.447,1-1,1h-1v1c0,.552-.447,1-1,1Zm3,9h-1c-.553,0-1-.448-1-1s.447-1,1-1h1c.553,0,1,.448,1,1s-.447,1-1,1Zm0-4h-1c-.553,0-1-.448-1-1s.447-1,1-1h1c.553,0,1,.448,1,1s-.447,1-1,1Zm-13,7.974c-1.207-.914-2-2.348-2-3.974v-8c0-1.627.793-3.061,2-3.974v15.949Zm22-11.974v8c0,1.627-.793,3.061-2,3.974V7.026c1.207.914,2,2.348,2,3.974Z"/>
+              </svg>
+              <span className="ms-3">Find Hospital</span>
+            </Link>
+          </li>
+          <li>
+            <Link
               to="/find/doctor"
               className="flex items-center p-2 rounded-lg text-white hover:text-gray-900 hover:bg-gray-100 group"
             >
