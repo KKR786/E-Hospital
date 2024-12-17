@@ -17,7 +17,7 @@ const getNearbyUsers = async (req, res) => {
   if(!bloodGroup) {
     emptyFields.push('bloodGroup')
   }
-  
+
   if(emptyFields.length > 0) {
     return res.status(400).json({ error: 'Please fill in all the fields', emptyFields })
   }
@@ -36,7 +36,11 @@ const getNearbyUsers = async (req, res) => {
         bloodGroup
       }).select('-password');
   
-      res.json({ nearbyUsers });
+      if( nearbyUsers.length > 0) {
+        res.json({ nearbyUsers });
+      }else {
+        res.json({ message: 'No users found' });
+      }
     } catch (err) {
       res.status(500).json({ message: 'Error finding nearby users', error: err.message });
     }

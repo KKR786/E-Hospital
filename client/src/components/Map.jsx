@@ -8,6 +8,7 @@ import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import { getCoordinates } from "../helper";
 import Success from "../components/toast/Success";
 import Error from "../components/toast/Error";
+import Card from "./Card";
 
 function Map({ query }) {
   const { user } = useAuthContext();
@@ -16,9 +17,11 @@ function Map({ query }) {
   const [coverage, setCoverage] = useState(5);
   const [coordinates, setCoordinates] = useState([0, 0]);
   const [place, setPlace] = useState("");
+
   const [bg, setBG] = useState("");
+  const [department, setDepartment] = useState("");
   const [nearByUsers, setNearByUsers] = useState([]);
-  const [showSelection, setShowSelection] = useState(false)
+  const [showSelection, setShowSelection] = useState(false);
   const [currentLocationName, setCurrentLocationName] = useState("");
   const [distances, setDistances] = useState([]);
   const [directionsUrl, setDirectionsUrl] = useState("");
@@ -28,7 +31,7 @@ function Map({ query }) {
   const markerRef = useRef(null);
   const markersArray = useRef([]);
   const routingControlRef = useRef(null);
-  
+
   useEffect(() => {
     if (!mapInstance.current) {
       mapInstance.current = L.map(mapRef.current).setView(
@@ -52,7 +55,7 @@ function Map({ query }) {
       const [lat, lon] = coordinates;
       mapMarker(lat, lon);
     }
-  }, [bg, coordinates]);
+  }, [bg, coverage, coordinates]);
 
   const mapMarker = async (lat, lon) => {
     const newCoordinates = [lat, lon];
@@ -72,16 +75,14 @@ function Map({ query }) {
         .openPopup();
     }
     await getPlaceName(lat, lon);
-    if(query === 'hospital') {
+    if (query === "hospital") {
       await fetchNearbyHospitals(lat, lon, coverage);
-    }
-    else if(query === 'blood') {
+    } else if (query === "blood") {
       await fetchUsersforBlood(lat, lon, coverage, bg);
     }
 
     // calculateDistances(lat, lon);
   };
-
 
   const getPlaceName = async (latitude, longitude) => {
     const response = await fetch(
@@ -126,71 +127,84 @@ function Map({ query }) {
   };
 
   const fetchUsersforBlood = async (lat, lon, d, bg) => {
-
     try {
       const res = await fetch(`/api/protected/find/blood`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${user.token}`,
-                    'Content-Type': 'application/json' },
-        body: JSON.stringify({ longitude: lon, latitude: lat, maxDistanceInMeters: d*1000, bloodGroup: bg })
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          longitude: lon,
+          latitude: lat,
+          maxDistanceInMeters: d * 1000,
+          bloodGroup: bg,
+        }),
       });
       const users = await res.json();
-    
+
       markersArray.current.forEach((marker) =>
         mapInstance.current.removeLayer(marker)
       );
       markersArray.current = [];
-    
+
       if (res.ok) {
-        console.log('test: ', users);
+        console.log("test: ", users);
         const groupedUsers = {};
+        
+        setShowSelection(false);
 
-        users.nearbyUsers.forEach((user) => {
-          const userCoordinates = user.address.coordinates;
-        const key = userCoordinates.join(",");
-
-        if (!groupedUsers[key]) {
-          groupedUsers[key] = []; 
+        if(users.message) {
+          alert(users.message);
         }
 
-        groupedUsers[key].push(user);
-      });
-      Object.keys(groupedUsers).forEach(coordinateKey => {
-        const [lon, lat] = coordinateKey.split(",").map(coord => parseFloat(coord));
-        const usersAtLocation = groupedUsers[coordinateKey];
+        users?.nearbyUsers?.forEach((user) => {
+          const userCoordinates = user.address.coordinates;
+          const key = userCoordinates.join(",");
 
-        const popupContent = `
+          if (!groupedUsers[key]) {
+            groupedUsers[key] = [];
+          }
+
+          groupedUsers[key].push(user);
+        });
+        Object.keys(groupedUsers).forEach((coordinateKey) => {
+          const [lon, lat] = coordinateKey
+            .split(",")
+            .map((coord) => parseFloat(coord));
+          const usersAtLocation = groupedUsers[coordinateKey];
+
+          const popupContent = `
           <div>
             <h4>${usersAtLocation.length} User(s) at this location</h4>
             <p>${user.address.place}</p>
           </div>
         `;
-        
-        const mark = L.marker([lat, lon])
-          .addTo(mapInstance.current)
-          .bindPopup(popupContent)
-          .on('click', () => {
-            setNearByUsers(usersAtLocation)
-            setShowSelection(true)
-          });
 
-        markersArray.current.push(mark);
-      });
-      }
-      else {
-        setError(`${users.error}. Ex- ${users.emptyFields}`)
+          const mark = L.marker([lat, lon])
+            .addTo(mapInstance.current)
+            .bindPopup(popupContent)
+            .on("click", () => {
+              setNearByUsers(usersAtLocation);
+              setShowSelection(true);
+            });
+
+          markersArray.current.push(mark);
+        });
+      } else {
+        setError(`${users.error}. Ex- ${users.emptyFields}`);
 
         setTimeout(() => {
           setError(null);
         }, 6000);
       }
     } catch (error) {
-      setError(error)
+      setError(error);
     }
-  }
+  };
 
   const fetchNearbyHospitals = async (latitude, longitude, d) => {
-    const radius = d * 1000; // 5km radius
+    const radius = d * 1000;
     const query = `
       [out:json];
       (
@@ -277,11 +291,10 @@ function Map({ query }) {
     setPlace(e.target.value);
   };
 
-
   return (
     <div className="flex flex-col items-center justify-center py-4">
       <div className="flex items-center flex-col gap-x-4 mt-5">
-      {query === "blood" && (
+        {query === "blood" && (
           <div className="relative">
             <label
               htmlFor="bloodGroup"
@@ -308,10 +321,44 @@ function Map({ query }) {
             </select>
           </div>
         )}
-        
-        <div className="flex items-center space-x-4 my-5">       
+
+        {query === "doctor" && (
           <div className="relative">
-            <label htmlFor="area" className="absolute top-[-13px] left-3 bg-gray-50 z-10">Area Cover (km)</label>
+            <label
+              htmlFor="department"
+              className="absolute top-[-13px] left-3 bg-gray-50"
+            >
+              Department
+            </label>
+            <select
+              name="department"
+              id="department"
+              onChange={(e) => setDepartment(e.target.value)}
+              className="rounded-lg block w-full p-2 bg-gray-50 border-[2.5px] border-gray-300 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="">Select Department</option>
+              <option value="Cardiologist">Cardiologist</option>
+              <option value="Dentist">Dentist</option>
+              <option value="Dermatologist">Dermatologist</option>
+              <option value="ENT Specialist">ENT Specialist</option>
+              <option value="Medicine">Medicine</option>
+              <option value="Neurologist">Neurologist</option>
+              <option value="Ophthalmologist">Ophthalmologist</option>
+              <option value="Orthopedic">Orthopedic</option>
+              <option value="Pediatrician">Pediatrician</option>
+            </select>
+          </div>
+        )}
+
+        <div className="flex items-center space-x-4 my-5">
+          <div className="relative">
+            <label
+              htmlFor="area"
+              className="absolute top-[-13px] left-3 bg-gray-50 z-10"
+            >
+              Area Cover (km)
+            </label>
             <div className="relative">
               <input
                 className="block w-full p-2 pe-10 text-sm text-gray-900 border-[2.5px] border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
@@ -328,7 +375,24 @@ function Map({ query }) {
             </div>
           </div>
 
-          <div className="flex-1 relative hidden md:block">
+          <button
+            onClick={getCurrentLocation}
+            className="flex items-center gap-x-2 text-white bg-gray-600 hover:bg-gray-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 text-white"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="m16.949,2.05c-1.321-1.322-3.079-2.05-4.949-2.05s-3.628.728-4.95,2.05c-2.729,2.729-2.729,7.17.008,9.907l2.495,2.44c.675.66,1.561.99,2.447.99s1.772-.33,2.447-.99l2.502-2.448c1.322-1.322,2.051-3.08,2.051-4.95s-.729-3.627-2.051-4.95Zm-4.949,7.94c-1.657,0-3-1.343-3-3s1.343-3,3-3,3,1.343,3,3-1.343,3-3,3Zm12,6.772c.002.354-.183.682-.485.863l-9.861,5.917c-.51.306-1.082.459-1.653.459s-1.144-.153-1.653-.459L.485,17.625c-.303-.182-.487-.51-.485-.863.002-.353.19-.679.495-.857l4.855-2.842c.1.11.203.219.309.325l2.495,2.439c1.028,1.006,2.395,1.561,3.846,1.561s2.817-.555,3.846-1.561l2.518-2.463c.098-.098.194-.199.287-.301l4.854,2.841c.305.179.493.505.495.857Z" />
+            </svg>
+            <span> Use Current Location</span>
+          </button>
+
+          <span>Or</span>
+
+          <div className="relative hidden md:block">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
               <svg
                 className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -358,40 +422,21 @@ function Map({ query }) {
             />
           </div>
 
-          <span>Or</span>
-
-          <div className="flex-1">
-            <button
-              onClick={getCurrentLocation}
-              className="flex items-center gap-x-2 text-white bg-gray-600 hover:bg-gray-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-white"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="m16.949,2.05c-1.321-1.322-3.079-2.05-4.949-2.05s-3.628.728-4.95,2.05c-2.729,2.729-2.729,7.17.008,9.907l2.495,2.44c.675.66,1.561.99,2.447.99s1.772-.33,2.447-.99l2.502-2.448c1.322-1.322,2.051-3.08,2.051-4.95s-.729-3.627-2.051-4.95Zm-4.949,7.94c-1.657,0-3-1.343-3-3s1.343-3,3-3,3,1.343,3,3-1.343,3-3,3Zm12,6.772c.002.354-.183.682-.485.863l-9.861,5.917c-.51.306-1.082.459-1.653.459s-1.144-.153-1.653-.459L.485,17.625c-.303-.182-.487-.51-.485-.863.002-.353.19-.679.495-.857l4.855-2.842c.1.11.203.219.309.325l2.495,2.439c1.028,1.006,2.395,1.561,3.846,1.561s2.817-.555,3.846-1.561l2.518-2.463c.098-.098.194-.199.287-.301l4.854,2.841c.305.179.493.505.495.857Z" />
-              </svg>
-              <span> Use Current Location</span>
-            </button>
-          </div>
-
           <button
-              className="flex items-center justify-center gap-x-3 text-white bg-green-600 hover:bg-green-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-              onClick={searchPlace}
+            className="flex items-center justify-center gap-x-3 text-white bg-green-600 hover:bg-green-700 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+            onClick={searchPlace}
+          >
+            Go
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              id="arrow-circle-down"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-5 h-5 "
             >
-              Go
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                id="arrow-circle-down"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5 "
-              >
-                <path d="M0,12A12,12,0,1,0,12,0,12.013,12.013,0,0,0,0,12ZM14.535,6.293l3.586,3.586h0a3,3,0,0,1,0,4.243l-3.586,3.585-.025.024a1,1,0,1,1-1.389-1.438L16.414,13,6,13.007a1,1,0,1,1,0-2L16.413,11,13.121,7.707a1,1,0,1,1,1.414-1.414Z" />
-              </svg>
-            </button>
+              <path d="M0,12A12,12,0,1,0,12,0,12.013,12.013,0,0,0,0,12ZM14.535,6.293l3.586,3.586h0a3,3,0,0,1,0,4.243l-3.586,3.585-.025.024a1,1,0,1,1-1.389-1.438L16.414,13,6,13.007a1,1,0,1,1,0-2L16.413,11,13.121,7.707a1,1,0,1,1,1.414-1.414Z" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -402,15 +447,23 @@ function Map({ query }) {
 
       <p>Coordinates: {coordinates.join(", ")}</p>
       <p>Current Location: {currentLocationName}</p>
-      {showSelection && 
-       <ul>
-        {nearByUsers.map((user, i) => 
-        <li key={i}>
-          <strong>{user.name}</strong> - {user.address.place}<br/>
-          <em>Blood Group: {user.bloodGroup}</em>
-        </li>)}
-       </ul>
-      }
+      {showSelection && (
+        <ul>
+          {nearByUsers.map((user, i) => (
+            <li key={i}>
+              <Card src={user.dp} alt={user.name} appt={true}>
+              <h5 class="mb-1 text-xl font-medium text-gray-900">{user.name.replace(/\w\S*/g, function (txt) {
+                        return (
+                          txt.charAt(0).toUpperCase() +
+                          txt.substr(1).toLowerCase()
+                        );
+                      })}</h5>
+                <span>Blood Group: {user.bloodGroup}</span>
+              </Card>
+            </li>
+          ))}
+        </ul>
+      )}
       {directionsUrl && (
         <a
           href={directionsUrl}
@@ -421,7 +474,7 @@ function Map({ query }) {
           Get Directions
         </a>
       )}
-      
+
       {success && <Success message={success} />}
       {error && <Error message={String(error)} />}
     </div>
