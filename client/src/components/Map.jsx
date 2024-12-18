@@ -351,6 +351,33 @@ function Map({ query }) {
           </div>
         )}
 
+{query === "therapist" && (
+          <div className="relative">
+            <label
+              htmlFor="department"
+              className="absolute top-[-13px] left-3 bg-gray-50"
+            >
+              Department
+            </label>
+            <select
+              name="department"
+              id="department"
+              onChange={(e) => setDepartment(e.target.value)}
+              className="rounded-lg block w-full p-2 bg-gray-50 border-[2.5px] border-gray-300 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="">Select Department</option>
+              <option value="Physiotherapist">Physiotherapist</option>
+              <option value="Occupational Therapist">Occupational Therapist</option>
+              <option value="Speech Therapist">Speech Therapist</option>
+              <option value="Psychotherapist">Psychotherapist</option>
+              <option value="Chiropractor">Chiropractor</option>
+              <option value="Rehabilitation Specialist">Rehabilitation Specialist</option>
+              <option value="Mental Health Therapist">Mental Health Therapist</option>
+            </select>
+          </div>
+        )}
+
         <div className="flex items-center space-x-4 my-5">
           <div className="relative">
             <label
