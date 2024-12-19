@@ -15,6 +15,7 @@ import UserManagement from "./pages/admin/UserManagement";
 import Restricted from "./ui/Restricted";
 import GetTherapists from "./pages/GetTherapists";
 import FindHospitals from "./pages/FindHospitals";
+import Appoinments from "./pages/Appoinments";
 
 function App() {
   const { user } = useAuthContext();
@@ -34,6 +35,8 @@ function App() {
               <Route path="/find/therapist" element={user ? <GetTherapists /> : <Navigate to='/login' />} />
               <Route path="/find/hospital" element={user ? <FindHospitals /> : <Navigate to='/login' />} />
               <Route path="/profile" element={user ? <Profile /> : <Navigate to='/login' />} />
+
+              <Route path="/appointment/:id" element={user ? <Appoinments /> : <Navigate to='/login' />} />
 
               <Route path="/user-management" element={user ? (user?.role != 'Member' ? <UserManagement /> : <Restricted />) : <Navigate to='/login' />} />
 

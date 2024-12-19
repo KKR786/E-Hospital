@@ -22,4 +22,4 @@ export const getCoordinates = async (place) => {
     else {
       return null;
     }
-  };
+};

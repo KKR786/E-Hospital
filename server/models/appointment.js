@@ -5,9 +5,10 @@ const Schema = mongoose.Schema
 
 
 const appointmentSchema = new Schema({
+    
   _id: {
     type: Number
-  },  
+  },
   patient: {
     type: Number,
     ref: 'User',
